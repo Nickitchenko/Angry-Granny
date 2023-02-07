@@ -10,18 +10,22 @@ public class EnemyControler : MonoBehaviour
     [Header("Enemy Stats")]
     public float enemyHealth; //хп ворога
     public float lookRadius = 4f; //радіус бачення ворога гравця
+    public int moneyForDie;
+    public int scoreForDie;
+    public GameObject deathEffect;
+
     //moving
-    public Vector3 currentpoint; //потрібна точка
+    private Vector3 currentpoint; //потрібна точка
     private Vector3 minPoint; //обмеження
     private Vector3 maxPoint;
-    private bool canMove = true; //чи може рухатись
 
-    [Header("Enemy shoot")]
-    private Transform target;//target to shoot
+    //shooting
+    [SerializeField] private Transform target;//target to shoot
+    [Header("Shoot")]
+    public float fireCountDown;//current cd of shooting
+    public float fireRate = 0;//cd of shooting
     public GameObject bulletPrefab;//bullet
     public Transform firePoint; //pont on enemy from which bullet fly to target
-    public float fireCountDown;//current cd of shooting
-    public float fireRate;//cd of shooting
 
     private bool simplemove = true;
 
@@ -39,7 +43,7 @@ public class EnemyControler : MonoBehaviour
     {
         if (simplemove)
         {
-            //політ до рандомної точки
+            //політ до потрібної точки
             agent.SetDestination(currentpoint);
             //Debug.Log("moving");
             //щукаємо нову точку
@@ -110,6 +114,12 @@ public class EnemyControler : MonoBehaviour
 
     private void Die()
     {
+        MoneyUI.currentMoney += moneyForDie;
+        ScoreUI.currentScore += scoreForDie;
+        EventManager.OnEnemyDied();
+        GameObject effect = (GameObject)Instantiate(deathEffect, transform.position, Quaternion.identity);
+        Destroy(effect, 1f);
+        Destroy(gameObject);
         Debug.Log("Enemy die");
     }
 

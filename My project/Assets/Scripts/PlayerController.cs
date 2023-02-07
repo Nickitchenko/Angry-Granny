@@ -1,31 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using System;
 using TMPro;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody),typeof(BoxCollider))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Stats")]
-    public float health;
-    public TMP_Text healthText;
-    [SerializeField] private Rigidbody rb;
+    public float healthCurrent;
+    public float healthMax;
+    public bool isCanTakeDamage=true;
+    public float moveSpeedCurrent;
+    public float moveSpeedStart;
+
+    [Header("UI")]
+    public Slider hpUI;
     [SerializeField] private FixedJoystick joystick;
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private float y;
+
+    [Header("Other")]
+    [SerializeField] private Rigidbody rb;
     public GameObject GFX;
 
-    private void Awake()
+    private void Start()
     {
-        healthText.text = "Health " + health.ToString();
+        healthCurrent = healthMax;
+        moveSpeedStart = moveSpeedCurrent;
     }
 
     private void FixedUpdate()
     {
         //moving player
-        rb.velocity = new Vector3(joystick.Horizontal * moveSpeed, rb.velocity.y, joystick.Vertical * moveSpeed);
+        rb.velocity = new Vector3(joystick.Horizontal * moveSpeedCurrent, rb.velocity.y, joystick.Vertical * moveSpeedCurrent);
         if(joystick.Horizontal != 0 || joystick.Vertical != 0)
         {
             GFX.transform.rotation = Quaternion.LookRotation(rb.velocity);
@@ -34,16 +38,23 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        //damage player
-        health -= amount;
-        //change hp ui
-        healthText.text = "Health " + health.ToString();
-        //healthBar.fillAmount = health / startHealth;
-
-        if (health <= 0)
+        if (isCanTakeDamage)
         {
-            Die();
+            //damage player
+            healthCurrent -= amount;
+            //change hp ui
+            ChangeHP();
+
+            if (healthCurrent <= 0)
+            {
+                Die();
+            }
         }
+    }
+
+    public void ChangeHP()
+    {
+        hpUI.GetComponent<HealthUI>().UpdateProgress(healthCurrent / healthMax);
     }
 
     private void Die()
@@ -53,7 +64,6 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-    //    y = transform.rotation.y;
-    //    transform.rotation = Quaternion.Euler(0, y, 0);
+
     }
 }

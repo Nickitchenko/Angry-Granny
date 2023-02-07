@@ -8,7 +8,7 @@ public class CameraController : MonoBehaviour
     public Vector3 offset;
     public float cameraSpeed=5f;
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
 
         Vector3 newPlayerPosition = playerTransform.position + offset;
